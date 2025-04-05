@@ -1,5 +1,6 @@
 import 'package:blue_connect/screens/device_com/device_com_vm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_joystick/flutter_joystick.dart';
 import 'package:provider/provider.dart';
 
 class DeviceComView extends StatelessWidget {
@@ -10,51 +11,41 @@ class DeviceComView extends StatelessWidget {
     var vm = context.watch<DeviceComVm>();
     return Scaffold(
       appBar: AppBar(title: Text(vm.device.name ?? vm.device.address)),
-      body: Builder(
-        builder: (context) {
-          if (vm.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!vm.isConnected) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Not connected'),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    vm.connect();
-                  },
-                  child: Text('Connect'),
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              if (vm.isLoading) LinearProgressIndicator(),
+              Expanded(
+                child: Center(
+                  child: vm.isReady ? Text('Connected') : Text('Connecting...'),
                 ),
-              ],
-            );
-          }
-          return Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Connected to ${vm.device.name}'),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    vm.sendMessage('ON');
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: JoystickArea(
+                  listener: (details) {
+                    if (!vm.isReady) return;
+                    vm.y = details.y;
                   },
-                  child: Text('ON'),
+                  mode: JoystickMode.vertical,
                 ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    vm.sendMessage('OFF');
+              ),
+              Expanded(
+                child: JoystickArea(
+                  listener: (details) {
+                    if (!vm.isReady) return;
+                    vm.x = details.x;
                   },
-                  child: Text('OFF'),
+                  mode: JoystickMode.horizontal,
                 ),
-              ],
-            ),
-          );
-        },
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
