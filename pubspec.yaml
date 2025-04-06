@@ -13,6 +13,7 @@ dependencies:
   flutter_joystick: ^0.2.1
   permission_handler: ^11.4.0
   provider: ^6.1.4
+  sliver_tools: ^0.2.12
 
 dev_dependencies:
   flutter_test:

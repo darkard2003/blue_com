@@ -10,42 +10,72 @@ class DeviceComView extends StatelessWidget {
   Widget build(BuildContext context) {
     var vm = context.watch<DeviceComVm>();
     return Scaffold(
-      appBar: AppBar(title: Text(vm.device.name ?? vm.device.address)),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              if (vm.isLoading) LinearProgressIndicator(),
-              Expanded(
-                child: Center(
-                  child: vm.isReady ? Text('Connected') : Text('Connecting...'),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(width: 20),
+                Expanded(
+                  child: JoystickArea(
+                    listener: (details) {
+                      if (!vm.isReady) return;
+                      vm.y = details.y;
+                    },
+                    mode: JoystickMode.vertical,
+                    initialJoystickAlignment: Alignment.centerLeft,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: JoystickArea(
-                  listener: (details) {
-                    if (!vm.isReady) return;
-                    vm.y = details.y;
-                  },
-                  mode: JoystickMode.vertical,
+                Expanded(
+                  child: JoystickArea(
+                    listener: (details) {
+                      if (!vm.isReady) return;
+                      vm.x = details.x;
+                    },
+                    initialJoystickAlignment: Alignment.centerRight,
+                    mode: JoystickMode.horizontal,
+                  ),
                 ),
-              ),
-              Expanded(
-                child: JoystickArea(
-                  listener: (details) {
-                    if (!vm.isReady) return;
-                    vm.x = details.x;
-                  },
-                  mode: JoystickMode.horizontal,
+                const SizedBox(width: 20),
+              ],
+            ),
+            Column(
+              children: [
+                if (vm.isLoading) LinearProgressIndicator(),
+                Row(
+                  children: [
+                    Spacer(),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-        ],
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(vm.device.name ?? "Unknown Device"),
+                      Text("${vm.device.rssi}"),
+                      Text(vm.device.address),
+                      const SizedBox(height: 20),
+                      vm.isReady ? Text('Connected') : Text('Not Connected'),
+                      if (!vm.isConnected)
+                        TextButton(
+                          onPressed: vm.connect,
+                          child: Text("Connect"),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

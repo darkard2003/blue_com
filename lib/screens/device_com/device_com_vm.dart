@@ -16,7 +16,7 @@ class DeviceComVm extends ChangeNotifier {
   double _x = 0;
   double _y = 0;
 
-  int get speed => ((1 + _y) * 127).toInt().clamp(0, 255);
+  int get speed => ((1 - _y) * 127).toInt().clamp(0, 255);
   int get angle => ((1 + _x) * 127).toInt().clamp(0, 255);
 
   set x(double value) {
@@ -39,11 +39,12 @@ class DeviceComVm extends ChangeNotifier {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    _periodicStateUpdateTimer = Timer.periodic(const Duration(seconds: 1), (
-      timer,
-    ) {
-      notifyListeners();
-    });
+    _periodicStateUpdateTimer = Timer.periodic(
+      const Duration(milliseconds: 500),
+      (timer) {
+        notifyListeners();
+      },
+    );
     init();
   }
 
@@ -109,7 +110,7 @@ class DeviceComVm extends ChangeNotifier {
 
   Future<void> connect() async {
     _isLoading = true;
-    if (_connection == null) {
+    if (!isConnected) {
       try {
         _connection = await _bluetooth.connect(device.address);
       } catch (e) {

@@ -4,6 +4,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_blue_classic/flutter_blue_classic.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+enum DeviceTypeView { scan, bonded }
+
+extension DeviceTypeViewTitle on DeviceTypeView {
+  String get name => switch (this) {
+    DeviceTypeView.bonded => "Bonded Devices",
+    DeviceTypeView.scan => "Scan Results",
+  };
+}
+
 class DeviceListVm extends ChangeNotifier {
   BuildContext context;
   DeviceListVm(this.context) {
@@ -33,6 +42,21 @@ class DeviceListVm extends ChangeNotifier {
   StreamSubscription<bool>? _scanStateSubscription;
   Timer? _scanTimeout;
 
+  DeviceTypeView _view = DeviceTypeView.scan;
+  DeviceTypeView get view => _view;
+  set view(DeviceTypeView value) {
+    _view = value;
+    notifyListeners();
+  }
+
+  List<BluetoothDevice> get devices {
+    if (_view == DeviceTypeView.bonded) {
+      return _bondedDevices;
+    } else {
+      return _scanResults;
+    }
+  }
+
   Future<void> init() async {
     _isSupported = await _bluetooth.isSupported;
     _isEnabled = await _bluetooth.isEnabled;
@@ -51,9 +75,11 @@ class DeviceListVm extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+    startScan();
   }
 
   Future<void> _checkBluetoothPermission() async {
+    _bluetoothPermissionGranted = await Permission.bluetooth.isGranted;
     if (_bluetoothPermissionGranted) {
       return;
     }
@@ -65,6 +91,7 @@ class DeviceListVm extends ChangeNotifier {
   }
 
   void startScan() {
+    view = DeviceTypeView.scan;
     _checkBluetoothPermission();
     _scanResults.clear();
     _bluetooth.startScan();

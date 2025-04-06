@@ -12,6 +12,8 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       routes: {
         '/': (context) => DeviceList(),
         '/com': (context) => DeviceCom(),
