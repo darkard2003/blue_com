@@ -9,19 +9,27 @@ class ConnectionStatusIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // Define dynamic colors based on connection state
+    final Color primaryColor =
+        vm.isConnected ? colorScheme.primary : colorScheme.error;
+    final Color containerColor =
+        vm.isConnected
+            ? colorScheme.primaryContainer.withOpacity(0.3)
+            : colorScheme.errorContainer.withOpacity(0.3);
+    final Color borderColor =
+        vm.isConnected
+            ? colorScheme.primary.withOpacity(0.5)
+            : colorScheme.error.withOpacity(0.5);
+    final Color connectingColor = colorScheme.tertiary;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       decoration: BoxDecoration(
-        color:
-            vm.isConnected
-                ? Colors.green.withAlpha(26)
-                : Colors.red.withAlpha(26),
+        color: containerColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: vm.isConnected ? Colors.green.shade300 : Colors.red.shade300,
-          width: 1,
-        ),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -30,7 +38,7 @@ class ConnectionStatusIndicator extends StatelessWidget {
             vm.isConnected
                 ? Icons.bluetooth_connected
                 : Icons.bluetooth_disabled,
-            color: vm.isConnected ? Colors.green : Colors.red,
+            color: primaryColor,
             size: 28,
           ),
           const SizedBox(width: 12),
@@ -40,7 +48,7 @@ class ConnectionStatusIndicator extends StatelessWidget {
               Text(
                 vm.isConnected ? "Connected" : "Disconnected",
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: vm.isConnected ? Colors.green : Colors.red,
+                  color: primaryColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -48,7 +56,7 @@ class ConnectionStatusIndicator extends StatelessWidget {
                 Text(
                   "Connecting...",
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.orange,
+                    color: connectingColor,
                   ),
                 ),
             ],

@@ -16,18 +16,31 @@ class RssiIndicator extends StatelessWidget {
     }
 
     return isCompact
-        ? _buildCompactIndicator(rssiValue, theme)
-        : _buildFullIndicator(rssiValue, theme);
+        ? _buildCompactIndicator(rssiValue, theme, context)
+        : _buildFullIndicator(rssiValue, theme, context);
   }
 
-  Widget _buildFullIndicator(int rssiValue, ThemeData theme) {
-    final (signalColor, signalText, signalBars) = _getSignalInfo(rssiValue);
+  Widget _buildFullIndicator(
+    int rssiValue,
+    ThemeData theme,
+    BuildContext context,
+  ) {
+    final colorScheme = theme.colorScheme;
+    final (signalColor, signalText, signalBars) = _getSignalInfo(
+      rssiValue,
+      colorScheme,
+    );
 
     return Row(
       children: [
-        Text('$rssiValue dBm', style: theme.textTheme.bodyLarge),
+        Text(
+          '$rssiValue dBm',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: colorScheme.onSurface,
+          ),
+        ),
         const SizedBox(width: 8),
-        _buildSignalBars(signalBars, signalColor),
+        _buildSignalBars(signalBars, signalColor, colorScheme),
         const SizedBox(width: 4),
         Text(
           signalText,
@@ -37,8 +50,13 @@ class RssiIndicator extends StatelessWidget {
     );
   }
 
-  Widget _buildCompactIndicator(int rssiValue, ThemeData theme) {
-    final (signalColor, _, signalBars) = _getSignalInfo(rssiValue);
+  Widget _buildCompactIndicator(
+    int rssiValue,
+    ThemeData theme,
+    BuildContext context,
+  ) {
+    final colorScheme = theme.colorScheme;
+    final (signalColor, _, signalBars) = _getSignalInfo(rssiValue, colorScheme);
 
     return SizedBox(
       width: 60,
@@ -51,6 +69,7 @@ class RssiIndicator extends StatelessWidget {
                 _buildSignalBars(
                   signalBars,
                   signalColor,
+                  colorScheme,
                   compact: true,
                 ).children,
           ),
@@ -59,7 +78,7 @@ class RssiIndicator extends StatelessWidget {
             '$rssiValue dBm',
             style: theme.textTheme.bodySmall?.copyWith(
               fontSize: 10,
-              color: theme.textTheme.bodySmall?.color?.withAlpha(204),
+              color: colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
           ),
@@ -68,25 +87,25 @@ class RssiIndicator extends StatelessWidget {
     );
   }
 
-  (Color, String, int) _getSignalInfo(int rssiValue) {
+  (Color, String, int) _getSignalInfo(int rssiValue, ColorScheme colorScheme) {
     Color signalColor;
     String signalText;
     int signalBars;
 
     if (rssiValue > -60) {
-      signalColor = Colors.green;
+      signalColor = colorScheme.primary;
       signalText = "Excellent";
       signalBars = 4;
     } else if (rssiValue > -70) {
-      signalColor = Colors.lightGreen;
+      signalColor = colorScheme.tertiary;
       signalText = "Good";
       signalBars = 3;
     } else if (rssiValue > -80) {
-      signalColor = Colors.orange;
+      signalColor = colorScheme.secondary;
       signalText = "Fair";
       signalBars = 2;
     } else {
-      signalColor = Colors.red;
+      signalColor = colorScheme.error;
       signalText = "Poor";
       signalBars = 1;
     }
@@ -96,7 +115,8 @@ class RssiIndicator extends StatelessWidget {
 
   Row _buildSignalBars(
     int signalBars,
-    Color signalColor, {
+    Color signalColor,
+    ColorScheme colorScheme, {
     bool compact = false,
   }) {
     final double baseHeight = compact ? 10 : 12;
@@ -110,7 +130,10 @@ class RssiIndicator extends StatelessWidget {
           height: baseHeight + (index * heightIncrement),
           width: width,
           decoration: BoxDecoration(
-            color: index < signalBars ? signalColor : Colors.grey.shade300,
+            color:
+                index < signalBars
+                    ? signalColor
+                    : colorScheme.surfaceVariant.withOpacity(0.5),
             borderRadius: BorderRadius.circular(compact ? 1 : 2),
           ),
         );

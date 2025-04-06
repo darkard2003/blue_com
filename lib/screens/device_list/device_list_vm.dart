@@ -21,22 +21,23 @@ class DeviceListVm extends ChangeNotifier {
 
   final FlutterBlueClassic _bluetooth = FlutterBlueClassic();
 
-  bool _isLoading = true;
+  bool _isInitializing = true;
   bool _isSupported = false;
   bool _isEnabled = false;
   bool _scanning = false;
   bool _bluetoothPermissionGranted = false;
 
-  bool get isLoading => _isLoading;
-  bool get isSupported => _isSupported;
-  bool get isEnabled => _isEnabled;
+  bool get isInitializing => _isInitializing;
+  bool get isSupported => _isInitializing || _isSupported;
+  bool get isEnabled => _isInitializing || _isEnabled;
   bool get scanning => _scanning;
 
   List<BluetoothDevice> _bondedDevices = [];
-  final List<BluetoothDevice> _scanResults = [];
+  // Using a Map with address as key to ensure uniqueness of devices
+  final Map<String, BluetoothDevice> _scanResultsMap = {};
 
   List<BluetoothDevice> get bondedDevices => _bondedDevices;
-  List<BluetoothDevice> get scanResults => _scanResults;
+  List<BluetoothDevice> get scanResults => _scanResultsMap.values.toList();
 
   StreamSubscription<BluetoothDevice>? _scanResultsSubscription;
   StreamSubscription<bool>? _scanStateSubscription;
@@ -53,7 +54,13 @@ class DeviceListVm extends ChangeNotifier {
     if (_view == DeviceTypeView.bonded) {
       return _bondedDevices;
     } else {
-      return _scanResults;
+      final sortedResults = scanResults;
+      sortedResults.sort((a, b) {
+        final aRssi = a.rssi ?? -100;
+        final bRssi = b.rssi ?? -100;
+        return bRssi.compareTo(aRssi);
+      });
+      return sortedResults;
     }
   }
 
@@ -64,7 +71,7 @@ class DeviceListVm extends ChangeNotifier {
     await _getDevices();
 
     _scanResultsSubscription = _bluetooth.scanResults.listen((result) {
-      _scanResults.add(result);
+      _scanResultsMap[result.address] = result;
       notifyListeners();
     });
 
@@ -73,7 +80,7 @@ class DeviceListVm extends ChangeNotifier {
       notifyListeners();
     });
 
-    _isLoading = false;
+    _isInitializing = false;
     notifyListeners();
     startScan();
   }
@@ -93,8 +100,9 @@ class DeviceListVm extends ChangeNotifier {
   void startScan() {
     view = DeviceTypeView.scan;
     _checkBluetoothPermission();
-    _scanResults.clear();
+    _scanResultsMap.clear();
     _bluetooth.startScan();
+    _scanning = true;
     _scanTimeout = Timer(const Duration(seconds: 10), () {
       stopScan();
     });

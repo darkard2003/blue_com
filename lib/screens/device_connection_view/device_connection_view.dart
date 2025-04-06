@@ -13,12 +13,7 @@ class DeviceConnectionView extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(vm.deviceName),
-        elevation: 2,
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-      ),
+      appBar: AppBar(title: Text(vm.deviceName), elevation: 2),
       body: Column(
         children: [
           if (vm.isConnecting)
