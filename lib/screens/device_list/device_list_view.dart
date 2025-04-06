@@ -1,4 +1,5 @@
 import 'package:blue_connect/screens/device_list/device_list_vm.dart';
+import 'package:blue_connect/screens/shared/rssi_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_classic/flutter_blue_classic.dart';
 import 'package:provider/provider.dart';
@@ -94,7 +95,7 @@ class BluetoothList extends StatelessWidget {
                                 onTap: () {
                                   Navigator.pushNamed(
                                     context,
-                                    '/com',
+                                    '/connection',
                                     arguments: {'device': result},
                                   );
                                 },
@@ -122,10 +123,16 @@ class DeviceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<DeviceListVm>();
+    final isScannedDevice = vm.view == DeviceTypeView.scan;
+
     return ListTile(
       title: Text(device.name ?? 'Unknown Device'),
       subtitle: Text(device.address),
-      trailing: const Icon(Icons.arrow_forward_ios),
+      trailing:
+          isScannedDevice && device.rssi != null
+              ? RssiIndicator(rssi: device.rssi.toString(), isCompact: true)
+              : const Icon(Icons.arrow_forward_ios),
       onTap: onTap,
     );
   }
