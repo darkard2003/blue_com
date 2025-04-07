@@ -14,61 +14,66 @@ class DeviceConnectionView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(vm.deviceName), elevation: 2),
-      body: Column(
+      body: ListView(
         children: [
           if (vm.isConnecting)
             LinearProgressIndicator(
               backgroundColor: theme.colorScheme.surfaceContainerHighest,
               color: theme.colorScheme.primary,
             ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  DeviceInfoCard(vm: vm),
-                  const SizedBox(height: 32),
-                  ConnectionStatusIndicator(vm: vm),
-                  const SizedBox(height: 24),
-                  ConnectionButton(vm: vm),
-
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ActionButton(
-                          icon: Icons.gamepad,
-                          label: "Controller",
-                          color: Colors.green,
-                          isEnabled: vm.isConnected,
-                          onTap: () {},
-                        ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                DeviceInfoCard(vm: vm),
+                const SizedBox(height: 32),
+                ConnectionStatusIndicator(vm: vm),
+                const SizedBox(height: 24),
+                ConnectionButton(vm: vm),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ActionButton(
+                        icon: Icons.gamepad,
+                        label: "Controller",
+                        color: Colors.green,
+                        isEnabled: vm.isConnected,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/controller',
+                            arguments: {
+                              'deviceConnection': vm.deviceConnection,
+                            },
+                          );
+                        },
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ActionButton(
-                          icon: Icons.terminal,
-                          label: "Monitor",
-                          color: Colors.orange,
-                          isEnabled: vm.isConnected,
-                          onTap: () {},
-                        ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ActionButton(
+                        icon: Icons.terminal,
+                        label: "Monitor",
+                        color: Colors.orange,
+                        isEnabled: vm.isConnected,
+                        onTap: () {},
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ActionButton(
-                          icon: Icons.radar,
-                          label: "Ping Test",
-                          color: Colors.purple,
-                          isEnabled: vm.isConnected,
-                          onTap: () {},
-                        ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ActionButton(
+                        icon: Icons.radar,
+                        label: "Ping Test",
+                        color: Colors.purple,
+                        isEnabled: vm.isConnected,
+                        onTap: () {},
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],

@@ -9,6 +9,11 @@ class ConnectionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    var connectedColor = theme.colorScheme.error;
+    var disconnectedColor = theme.colorScheme.primary;
+
+    var onConnectedColor = theme.colorScheme.onError;
+    var onDisconnectedColor = theme.colorScheme.onPrimary;
 
     return Column(
       children: [
@@ -18,12 +23,7 @@ class ConnectionButton extends StatelessWidget {
           ),
           height: 56,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors:
-                  vm.isConnected
-                      ? [Colors.red.shade400, Colors.red.shade700]
-                      : [Colors.blue.shade400, Colors.blue.shade700],
-            ),
+            color: vm.isConnected ? connectedColor : disconnectedColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -55,9 +55,9 @@ class ConnectionButton extends StatelessWidget {
                           ? Icons.bluetooth_disabled
                           : Icons.bluetooth_connected,
                       color:
-                          vm.isConnecting
-                              ? Colors.white.withAlpha(128)
-                              : Colors.white,
+                          vm.isConnected
+                              ? onConnectedColor
+                              : onDisconnectedColor,
                       size: 24,
                     ),
                     const SizedBox(width: 12),
@@ -65,9 +65,9 @@ class ConnectionButton extends StatelessWidget {
                       vm.isConnected ? "Disconnect" : "Connect",
                       style: theme.textTheme.titleMedium?.copyWith(
                         color:
-                            vm.isConnecting
-                                ? Colors.white.withAlpha(128)
-                                : Colors.white,
+                            vm.isConnected
+                                ? onConnectedColor
+                                : onDisconnectedColor,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
@@ -76,19 +76,6 @@ class ConnectionButton extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-        ),
-
-        const SizedBox(height: 24),
-        TextButton.icon(
-          onPressed: vm.reconnect,
-          icon: Icon(Icons.refresh, size: 18, color: theme.colorScheme.primary),
-          label: Text(
-            "Retry Connection",
-            style: TextStyle(color: theme.colorScheme.primary),
-          ),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           ),
         ),
       ],

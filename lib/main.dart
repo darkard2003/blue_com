@@ -1,3 +1,4 @@
+import 'package:blue_connect/screens/controller_screen/controller_screen.dart';
 import 'package:blue_connect/screens/device_com/device_com.dart';
 import 'package:blue_connect/screens/device_connection_view/device_connection.dart';
 import 'package:blue_connect/screens/device_list/device_list.dart';
@@ -15,24 +16,25 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        // Fallback color schemes if dynamic colors are not available
+        var primaryColor = Colors.cyan;
         ColorScheme lightColorScheme = ColorScheme.fromSeed(
-          seedColor: Colors.cyan,
+          seedColor: primaryColor,
           brightness: Brightness.light,
         );
 
         ColorScheme darkColorScheme = ColorScheme.fromSeed(
-          seedColor: Colors.cyan,
+          seedColor: primaryColor,
           brightness: Brightness.dark,
         );
 
-        // Use dynamic color scheme if available
         if (lightDynamic != null) {
-          lightColorScheme = lightDynamic;
+          lightDynamic = lightDynamic.copyWith(primary: primaryColor);
+          lightColorScheme = lightDynamic.harmonized();
         }
 
         if (darkDynamic != null) {
-          darkColorScheme = darkDynamic;
+          darkDynamic = darkDynamic.copyWith(primary: primaryColor);
+          darkColorScheme = darkDynamic.harmonized();
         }
 
         return MaterialApp(
@@ -44,6 +46,7 @@ class MainApp extends StatelessWidget {
           routes: {
             '/': (context) => DeviceList(),
             '/com': (context) => DeviceCom(),
+            '/controller': (context) => ControllerScreen(),
             '/connection': (context) => DeviceConnection(),
           },
           initialRoute: '/',
