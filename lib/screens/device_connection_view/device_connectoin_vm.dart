@@ -74,13 +74,13 @@ class DeviceConnectoinVm extends ChangeNotifier {
       await _deviceConnection.connect();
       if (!_deviceConnection.isConnected && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to connect to ${deviceName}")),
+          SnackBar(content: Text("Failed to connect to $deviceName")),
         );
       }
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to connect to ${deviceName}")),
+        SnackBar(content: Text("Failed to connect to $deviceName")),
       );
       debugPrint("$e");
     } finally {
@@ -102,11 +102,11 @@ class DeviceConnectoinVm extends ChangeNotifier {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     _periodicUpdatetimer?.cancel();
     _connectionStateSubscription?.cancel();
     _errorSubscription?.cancel();
-    _deviceConnection.dispose();
+    await _deviceConnection.dispose();
     super.dispose();
   }
 }

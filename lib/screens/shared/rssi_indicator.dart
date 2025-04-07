@@ -133,7 +133,7 @@ class RssiIndicator extends StatelessWidget {
             color:
                 index < signalBars
                     ? signalColor
-                    : colorScheme.surfaceVariant.withOpacity(0.5),
+                    : colorScheme.surfaceContainerHighest.withAlpha(128),
             borderRadius: BorderRadius.circular(compact ? 1 : 2),
           ),
         );

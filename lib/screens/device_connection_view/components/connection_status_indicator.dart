@@ -16,12 +16,12 @@ class ConnectionStatusIndicator extends StatelessWidget {
         vm.isConnected ? colorScheme.primary : colorScheme.error;
     final Color containerColor =
         vm.isConnected
-            ? colorScheme.primaryContainer.withOpacity(0.3)
-            : colorScheme.errorContainer.withOpacity(0.3);
+            ? colorScheme.primaryContainer.withAlpha(77) // 0.3 * 255 ≈ 77
+            : colorScheme.errorContainer.withAlpha(77);
     final Color borderColor =
         vm.isConnected
-            ? colorScheme.primary.withOpacity(0.5)
-            : colorScheme.error.withOpacity(0.5);
+            ? colorScheme.primary.withAlpha(128) // 0.5 * 255 ≈ 128
+            : colorScheme.error.withAlpha(128);
     final Color connectingColor = colorScheme.tertiary;
 
     return Container(

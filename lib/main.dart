@@ -1,7 +1,7 @@
 import 'package:blue_connect/screens/controller_screen/controller_screen.dart';
-import 'package:blue_connect/screens/device_com/device_com.dart';
 import 'package:blue_connect/screens/device_connection_view/device_connection.dart';
 import 'package:blue_connect/screens/device_list/device_list.dart';
+import 'package:blue_connect/screens/monitor_screen/monitor_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 
@@ -45,9 +45,9 @@ class MainApp extends StatelessWidget {
           ),
           routes: {
             '/': (context) => DeviceList(),
-            '/com': (context) => DeviceCom(),
             '/controller': (context) => ControllerScreen(),
             '/connection': (context) => DeviceConnection(),
+            '/monitor': (context) => MonitorScreen(),
           },
           initialRoute: '/',
         );

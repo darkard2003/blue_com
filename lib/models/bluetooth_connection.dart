@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
+import 'package:blue_connect/models/bluetooth_message.dart';
 import 'package:flutter_blue_classic/flutter_blue_classic.dart';
 
 class BluetoothDeviceConnection {
@@ -7,20 +9,15 @@ class BluetoothDeviceConnection {
   final FlutterBlueClassic _bluetooth = FlutterBlueClassic();
   BluetoothConnection? connection;
 
+  List<BluetoothMessage> _messages = [];
+
   Timer? _periodicUpdateTimer;
+
+  StreamSubscription? _inputSubscription;
 
   BluetoothDeviceConnection({required this.device, this.connection}) {
     _periodicUpdateTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _connectionStateController.add(isConnected);
-    });
-    _init();
-  }
-
-  void _init() {
-    _bluetooth.isEnabled.then((isEnabled) {
-      if (isEnabled) {
-        connect();
-      } else {}
     });
   }
 
@@ -29,6 +26,18 @@ class BluetoothDeviceConnection {
 
   final StreamController<Exception> _errorController =
       StreamController<Exception>.broadcast();
+
+  final StreamController<List<BluetoothMessage>> _messagesController =
+      StreamController<List<BluetoothMessage>>.broadcast();
+
+  Stream<List<BluetoothMessage>> get messagesStream =>
+      _messagesController.stream;
+
+  List<BluetoothMessage> get messages {
+    var sortedMessages = List<BluetoothMessage>.from(_messages);
+    sortedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return sortedMessages;
+  }
 
   Stream<bool> get connectionState => _connectionStateController.stream;
   Stream<Exception> get errorStream => _errorController.stream;
@@ -44,7 +53,14 @@ class BluetoothDeviceConnection {
     }
 
     try {
+      _inputSubscription?.cancel();
+      _inputSubscription = null;
       connection = await _bluetooth.connect(device.address);
+      _inputSubscription = connection?.input?.listen((data) {
+        final message = BluetoothMessage.fromBytes(data);
+        _messages.add(message);
+        _messagesController.add(_messages);
+      });
       _connectionStateController.add(true);
     } catch (e) {
       _connectionStateController.add(false);
@@ -71,15 +87,40 @@ class BluetoothDeviceConnection {
     if (isConnected) {
       try {
         connection?.output.add(data);
+        await connection?.output.allSent; 
       } catch (e) {
         _errorController.add(Exception("Failed to send data"));
       }
     }
   }
 
-  void dispose() {
+  Future<void> sendMessage(String message) async {
+    if (isConnected) {
+      try {
+        var messageBytes = utf8.encode(message);
+        var data = Uint8List.fromList(messageBytes);
+        BluetoothMessage bluetoothMessage = BluetoothMessage.fromBytes(
+          data,
+          isSent: true,
+        );
+        connection?.output.add(data);
+        await connection?.output.allSent;
+        _messages.add(bluetoothMessage);
+        _messagesController.add(_messages);
+      } catch (e) {
+        _errorController.add(Exception("Failed to send message"));
+      }
+    }
+  }
+
+  Future<void> dispose() async {
     _periodicUpdateTimer?.cancel();
+    _inputSubscription?.cancel();
+
+    await disconnect();
+
     _connectionStateController.close();
-    disconnect();
+    _errorController.close();
+    _messagesController.close();
   }
 }

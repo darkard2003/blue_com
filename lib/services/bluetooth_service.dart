@@ -140,13 +140,16 @@ class BluetoothService {
     return await _bluetooth.isEnabled;
   }
 
-  void dispose() {
+  Future<void> dispose() async {
     stopScan();
     _scanResultsSubscription?.cancel();
     _scanStateSubscription?.cancel();
+    _scanTimeout?.cancel();
+
+    await disconnect();
+
     _scanResultsController.close();
     _scanningStateController.close();
-    _connection?.dispose();
     _connectionStateController.close();
   }
 

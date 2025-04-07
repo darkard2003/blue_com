@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:blue_connect/models/bluetooth_connection.dart';
 import 'package:flutter/material.dart';
@@ -115,7 +114,7 @@ class ControllerScreenVm extends ChangeNotifier {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -124,6 +123,9 @@ class ControllerScreenVm extends ChangeNotifier {
     _periodicUpdateTimer?.cancel();
     _connectionStateSubscription?.cancel();
     _errorSubscription?.cancel();
+
+    // Don't dispose the deviceConnection here as it might be managed by the parent widget
+
     super.dispose();
   }
 }

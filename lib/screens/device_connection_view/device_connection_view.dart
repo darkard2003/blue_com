@@ -58,7 +58,15 @@ class DeviceConnectionView extends StatelessWidget {
                         label: "Monitor",
                         color: Colors.orange,
                         isEnabled: vm.isConnected,
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/monitor',
+                            arguments: {
+                              'deviceConnection': vm.deviceConnection,
+                            },
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(width: 12),
