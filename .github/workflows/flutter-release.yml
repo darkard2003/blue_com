@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
 
+# Add permissions needed for creating releases
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     name: Build & Release APK
@@ -14,6 +19,7 @@ jobs:
       - name: Extract tag version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
       - name: Update version in pubspec.yaml
         uses: fjogeleit/yaml-update-action@main
         with:
@@ -43,11 +49,6 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.get_version.outputs.VERSION }}
-          name: Release v${{ steps.get_version.outputs.VERSION }}
-          draft: false
-          prerelease: false
-          files: |
-            build/app/outputs/flutter-apk/app-release.apk
+          files: build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
