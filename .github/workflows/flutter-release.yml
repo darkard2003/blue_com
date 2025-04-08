@@ -2,54 +2,24 @@ name: Flutter Release
 
 on:
   push:
-    branches: [ master ]
+    tags:
+      - 'v*'
 
 jobs:
-  version:
-    name: Create version number
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.15
-        with:
-          versionSpec: '5.x'
-      - name: Use GitVersion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.15
-      - name: Create version.txt with nuGetVersion
-        run: echo "${{ steps.gitversion.outputs.nuGetVersion }}" > version.txt
-      - name: Upload version.txt
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitversion
-          path: version.txt
-
   build:
     name: Build & Release APK
-    needs: [ version ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Get version.txt
-        uses: actions/download-artifact@v4
-        with:
-          name: gitversion
-      - name: Create new file without newline char from version.txt
-        run: tr -d '\n' < version.txt > version1.txt
-      - name: Read version
-        id: version
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: version1.txt
+      - name: Extract tag version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
       - name: Update version in pubspec.yaml
         uses: fjogeleit/yaml-update-action@main
         with:
           valueFile: 'pubspec.yaml'
           propertyPath: 'version'
-          value: ${{ steps.version.outputs.content }}
+          value: ${{ steps.get_version.outputs.VERSION }}
           commitChange: false
           updateFile: true
 
@@ -73,8 +43,8 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.version.outputs.content }}
-          name: Release v${{ steps.version.outputs.content }}
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          name: Release v${{ steps.get_version.outputs.VERSION }}
           draft: false
           prerelease: false
           files: |
