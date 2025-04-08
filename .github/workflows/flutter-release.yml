@@ -1,0 +1,83 @@
+name: Flutter Release
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  version:
+    name: Create version number
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.15
+        with:
+          versionSpec: '5.x'
+      - name: Use GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.15
+      - name: Create version.txt with nuGetVersion
+        run: echo "${{ steps.gitversion.outputs.nuGetVersion }}" > version.txt
+      - name: Upload version.txt
+        uses: actions/upload-artifact@v3
+        with:
+          name: gitversion
+          path: version.txt
+
+  build:
+    name: Build & Release APK
+    needs: [ version ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get version.txt
+        uses: actions/download-artifact@v3
+        with:
+          name: gitversion
+      - name: Create new file without newline char from version.txt
+        run: tr -d '\n' < version.txt > version1.txt
+      - name: Read version
+        id: version
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: version1.txt
+      - name: Update version in pubspec.yaml
+        uses: fjogeleit/yaml-update-action@main
+        with:
+          valueFile: 'pubspec.yaml'
+          propertyPath: 'version'
+          value: ${{ steps.version.outputs.content }}
+          commitChange: false
+          updateFile: true
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.3'
+          channel: 'stable'
+          
+      - name: Get Flutter dependencies
+        run: flutter pub get
+        
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.content }}
+          name: Release v${{ steps.version.outputs.content }}
+          draft: false
+          prerelease: false
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
