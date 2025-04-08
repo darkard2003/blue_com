@@ -22,7 +22,7 @@ jobs:
       - name: Create version.txt with nuGetVersion
         run: echo "${{ steps.gitversion.outputs.nuGetVersion }}" > version.txt
       - name: Upload version.txt
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: gitversion
           path: version.txt
@@ -34,7 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Get version.txt
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: gitversion
       - name: Create new file without newline char from version.txt
