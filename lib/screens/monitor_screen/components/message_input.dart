@@ -28,7 +28,7 @@ class MessageInput extends StatelessWidget {
     final activeTextColor =
         colorScheme.brightness == Brightness.dark
             ? colorScheme.primary
-            : colorScheme.primary.withBlue(colorScheme.primary.blue + 20);
+            : colorScheme.primary;
     final disabledTextColor = colorScheme.onSurface.withAlpha(128);
 
     return Container(

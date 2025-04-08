@@ -27,7 +27,7 @@ class ControllerScreenVm extends ChangeNotifier {
   String get rssi => deviceConnection.rssi;
 
   int get speed => ((1 - _y) * 127).toInt().clamp(0, 255);
-  int get angle => ((1 + _x) * 127).toInt().clamp(0, 255);
+  int get angle => ((1 - _x) * 127).toInt().clamp(0, 255);
 
   double get speedPercent => ((_speed / 255) * 100).clamp(0, 100);
   double get anglePercent => (((_angle / 255) * 200) - 100).clamp(-100, 100);
