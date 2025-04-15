@@ -39,7 +39,7 @@ class DeviceConnectionView extends StatelessWidget {
                         icon: Icons.gamepad,
                         label: "Controller",
                         color: Colors.green,
-                        isEnabled: vm.isConnected,
+                        isEnabled: true,
                         onTap: () {
                           Navigator.pushNamed(
                             context,
@@ -57,7 +57,7 @@ class DeviceConnectionView extends StatelessWidget {
                         icon: Icons.terminal,
                         label: "Monitor",
                         color: Colors.orange,
-                        isEnabled: vm.isConnected,
+                        isEnabled: true,
                         onTap: () {
                           Navigator.pushNamed(
                             context,
@@ -75,7 +75,7 @@ class DeviceConnectionView extends StatelessWidget {
                         icon: Icons.radar,
                         label: "Ping Test",
                         color: Colors.purple,
-                        isEnabled: vm.isConnected,
+                        isEnabled: false,
                         onTap: () {},
                       ),
                     ),
