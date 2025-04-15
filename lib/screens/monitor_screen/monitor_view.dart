@@ -19,7 +19,7 @@ class MonitorView extends StatelessWidget {
             : colorScheme.surfaceContainerHighest.withAlpha(230);
     final statusConnected = colorScheme.primary;
     final statusDisconnected = colorScheme.error;
-    final statusTextColor = colorScheme.onSurface.withAlpha(217);
+    colorScheme.onSurface.withAlpha(217);
     final noDataColor = colorScheme.onSurface.withAlpha(153);
 
     return Scaffold(

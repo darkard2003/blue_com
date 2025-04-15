@@ -9,7 +9,7 @@ class BluetoothDeviceConnection {
   final FlutterBlueClassic _bluetooth = FlutterBlueClassic();
   BluetoothConnection? connection;
 
-  List<BluetoothMessage> _messages = [];
+  final List<BluetoothMessage> _messages = [];
 
   Timer? _periodicUpdateTimer;
 
