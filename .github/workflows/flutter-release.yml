@@ -24,7 +24,7 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Update version in pubspec.yaml
-        uses: fjogeleit/yaml-update-action@mainupload
+        uses: fjogeleit/yaml-update-action@main
         with:
           valueFile: 'pubspec.yaml'
           propertyPath: 'version'
