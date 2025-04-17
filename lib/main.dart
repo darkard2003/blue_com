@@ -16,14 +16,15 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return DynamicColorBuilder(
       builder: (ColorScheme? lightDynamic, ColorScheme? darkDynamic) {
-        var primaryColor = Colors.cyan;
+        var darkPrimaryColor = Colors.cyan;
+        var primaryColor = Colors.cyan[700]!;
         ColorScheme lightColorScheme = ColorScheme.fromSeed(
           seedColor: primaryColor,
           brightness: Brightness.light,
         );
 
         ColorScheme darkColorScheme = ColorScheme.fromSeed(
-          seedColor: primaryColor,
+          seedColor: darkPrimaryColor,
           brightness: Brightness.dark,
         );
 
@@ -33,7 +34,7 @@ class MainApp extends StatelessWidget {
         }
 
         if (darkDynamic != null) {
-          darkDynamic = darkDynamic.copyWith(primary: primaryColor);
+          darkDynamic = darkDynamic.copyWith(primary: darkPrimaryColor);
           darkColorScheme = darkDynamic.harmonized();
         }
 

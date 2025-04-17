@@ -1,5 +1,9 @@
 # Blue Connect
 
+<p align="center">
+  <img src="assets/icons/icon_with_background.svg" width="150" alt="Blue Connect Logo">
+</p>
+
 A Flutter application for Bluetooth communication with microcontrollers, designed specifically for remote control (RC) applications and Bluetooth serial communication.
 
 ## Features
@@ -90,3 +94,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Credits
+
+- Icons designed by [Neelakshi Das](https://github.com/bluecoder2003)
