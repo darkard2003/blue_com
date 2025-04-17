@@ -30,7 +30,6 @@ jobs:
           propertyPath: 'version'
           value: ${{ steps.get_version.outputs.VERSION }}
           commitChange: false
-          updateFile: true
 
       - uses: actions/setup-java@v3
         with:
