@@ -16,12 +16,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for changelog generation
+          
       - name: Extract tag version
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Update version in pubspec.yaml
-        uses: fjogeleit/yaml-update-action@main
+        uses: fjogeleit/yaml-update-action@mainupload
         with:
           valueFile: 'pubspec.yaml'
           propertyPath: 'version'
@@ -45,10 +48,42 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
+      - name: Rename APK file
+        run: |
+          mkdir -p release
+          cp build/app/outputs/flutter-apk/app-release.apk release/blue_connect_${{ steps.get_version.outputs.VERSION }}.apk
+
+      - name: Generate checksum
+        run: |
+          cd release
+          sha256sum blue_connect_${{ steps.get_version.outputs.VERSION }}.apk > blue_connect_${{ steps.get_version.outputs.VERSION }}.apk.sha256
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 $(git rev-list --tags --skip=1 --max-count=1) 2>/dev/null || echo "")
+          if [ -z "$PREV_TAG" ]; then
+            # If no previous tag exists, use the first commit
+            git log --pretty=format:"- %s (%h)" > CHANGELOG.md
+          else
+            # Generate changelog since the previous tag
+            git log $PREV_TAG..HEAD --pretty=format:"- %s (%h)" > CHANGELOG.md
+          fi
+          echo "CHANGELOG_CONTENT<<EOF" >> $GITHUB_ENV
+          cat CHANGELOG.md >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/outputs/flutter-apk/app-release.apk
+          files: |
+            release/blue_connect_${{ steps.get_version.outputs.VERSION }}.apk
+            release/blue_connect_${{ steps.get_version.outputs.VERSION }}.apk.sha256
+          body: |
+            ## Blue Connect ${{ steps.get_version.outputs.VERSION }}
+            
+            ### Changelog:
+            ${{ env.CHANGELOG_CONTENT }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
